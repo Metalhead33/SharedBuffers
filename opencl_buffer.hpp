@@ -17,28 +17,30 @@ public:
 private:
 	cl::Buffer buff;
 	size_t _size;
-public:
-	size_t size() const { return _size; }
 	void resizeAndPreserve(size_t newSize)
 	{
+		if(newSize == _size) return;
 		size_t oldsize = _size;
 		std::vector<T> tmp(_size);
 		context->queue.enqueueReadBuffer(buff,CL_TRUE,0,sizeof(T)*oldsize,tmp.data());
 		buff = cl::Buffer(context->context,CL_MEM_READ_WRITE,sizeof(T)*newSize);
 		_size = newSize;
-		context->queue.enqueueWriteBuffer(buff,CL_TRUE,0,sizeof(T)*oldsize,tmp.data());
+		context->queue.enqueueWriteBuffer(buff,CL_TRUE,0,sizeof(T)*std::min(oldsize,newSize),tmp.data());
 	}
 	void resizeWithoutPreserve(size_t newSize)
 	{
+		if(newSize == _size) return;
 		buff = cl::Buffer(context->context,CL_MEM_READ_WRITE,sizeof(T)*newSize);
 		_size = newSize;
 	}
+public:
+	// Necessary for basic function?
+	size_t size() const { return _size; }
 	void resize(size_t newSize,bool preserve=false)
 	{
 		if(preserve) resizeAndPreserve(newSize);
 		else resizeWithoutPreserve(newSize);
 	}
-
 	void copy_from(const T* source, size_t quantity, bool force_resize=false, size_t to_offset=0)
 	{
 		if(force_resize && (_size>(quantity+to_offset))) resize(quantity+to_offset,true);
@@ -61,6 +63,35 @@ public:
 	void copy_to(T* output, size_t quantity, size_t offset=0) const
 	{
 		context->queue.enqueueReadBuffer(buff,CL_TRUE,offset,std::min(quantity,_size-offset),output);
+	}
+	const cl::Buffer& getBuffer() const { return buff; }
+	// Constructors
+	opencl_buffer(SharedContext context)
+		: context(context), buff(), _size(0)
+	{
+		;
+	}
+	opencl_buffer(SharedContext context, size_t nsize)
+		: context(context), buff(context->context,CL_MEM_READ_WRITE,sizeof(T)*nsize), _size(nsize)
+	{
+		;
+	}
+	opencl_buffer(SharedContext context, const T* origin, size_t nsize)
+		: context(context), buff(context->context,CL_MEM_READ_WRITE,sizeof(T)*nsize), _size(nsize)
+	{
+		context->queue.enqueueWriteBuffer(buff,CL_TRUE,0,sizeof(T)*nsize,origin);
+	}
+	opencl_buffer(SharedContext context, const base_buffer& cpy)
+		: context(context), buff(context->context,CL_MEM_READ_WRITE,sizeof(T)*cpy.size()), _size(cpy.size())
+	{
+		std::vector<T> tmp(_size);
+		cpy.copy_to(tmp.data(),_size);
+		context->queue.enqueueWriteBuffer(buff,CL_TRUE,0,sizeof(T)*_size,tmp.data());
+	}
+	opencl_buffer(const opencl_buffer& cpy) // Copy constructor
+		: context(cpy.context), buff(context->context,CL_MEM_READ_WRITE,sizeof(T)*cpy.size()), _size(cpy.size())
+	{
+		context->queue.enqueueCopyBuffer(cpy.buff,buff,0,0,cpy.size()*sizeof(T));
 	}
 };
 

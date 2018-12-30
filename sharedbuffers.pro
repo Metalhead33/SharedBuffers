@@ -8,4 +8,5 @@ SOURCES +=
 HEADERS += \
     abstract_buffer.hpp \
     host_buffer.hpp \
-    opencl_buffer.hpp
+    opencl_buffer.hpp \
+    opengl_buffer.hpp

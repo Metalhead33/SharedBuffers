@@ -49,7 +49,7 @@ public:
 	void copy_from(const base_buffer& source, size_t quantity, bool force_resize=false, size_t to_offset=0, size_t from_offset=0)
 	{
 		if(force_resize && (_size>(quantity+to_offset))) resize(quantity+to_offset,true);
-		opencl_buffer* clbuff = dynamic_cast<opencl_buffer>(&source);
+		opencl_buffer* clbuff = dynamic_cast<opencl_buffer*>(&source);
 		if(clbuff) // Now we're cooking with gas
 		{
 			context->queue.enqueueCopyBuffer(clbuff->buff,buff,sizeof(T)*from_offset,sizeof(T)*to_offset,sizeof(T)*quantity);

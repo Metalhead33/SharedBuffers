@@ -37,7 +37,7 @@ private:
 	{
 		if(newSize == _size) return;
 		if(dev_mem) cudaFree(&dev_mem);
-		cudaMallocManaged(&dev_mem,newSize*sizeof(T));
+		cudaMalloc(&dev_mem,newSize*sizeof(T));
 		_size = newSize;
 	}
 	void reallocateAndPreserve(size_t newSize)
@@ -98,18 +98,18 @@ public:
 	cuda_buffer(size_t nSize)
 		: dev_mem(nullptr), _size(nSize)
 	{
-		cudaMallocManaged(&dev_mem,nSize*sizeof(T));
+		cudaMalloc(&dev_mem,nSize*sizeof(T));
 	}
 	cuda_buffer(const T* source, size_t nSize)
 		: dev_mem(nullptr), _size(nSize)
 	{
-		cudaMallocManaged(&dev_mem,nSize*sizeof(T));
+		cudaMalloc(&dev_mem,nSize*sizeof(T));
 		cudaMemcpy(dev_mem,source,sizeof(T)*nSize,cudaMemcpyHostToDevice);
 	}
 	cuda_buffer(const base_buffer& cpy)
 		: dev_mem(nullptr), _size(cpy.size())
 	{
-		cudaMallocManaged(&dev_mem,_size*sizeof(T));
+		cudaMalloc(&dev_mem,_size*sizeof(T));
 		const cuda_buffer* cudabuff = dynamic_cast<const cuda_buffer*>(&cpy); // Is it compatible?
 		if(cudabuff) // Now we're cooking with gas!
 		{

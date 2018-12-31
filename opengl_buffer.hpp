@@ -60,7 +60,7 @@ public:
 	void copy_from(const base_buffer& source, size_t quantity, bool force_resize=false, size_t to_offset=0, size_t from_offset=0)
 	{
 		if(force_resize && (_size>(quantity+to_offset))) resize(quantity+to_offset,true);
-		opengl_buffer* glbuff = dynamic_cast<opengl_buffer*>(&source); // Is it compatible?
+		const opengl_buffer* glbuff = dynamic_cast<const opengl_buffer*>(&source); // Is it compatible?
 		if(glbuff) // Oh yeah, now we're cooking with gas
 		{
 			glBindBuffer(GL_COPY_READ_BUFFER,glbuff->id);

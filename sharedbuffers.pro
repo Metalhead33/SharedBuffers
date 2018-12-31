@@ -10,3 +10,6 @@ HEADERS += \
     host_buffer.hpp \
     opencl_buffer.hpp \
     opengl_buffer.hpp
+
+DISTFILES += \
+    cuda_buffer.cu

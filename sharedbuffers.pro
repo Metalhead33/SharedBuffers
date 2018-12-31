@@ -9,7 +9,7 @@ HEADERS += \
     abstract_buffer.hpp \
     host_buffer.hpp \
     opencl_buffer.hpp \
-    opengl_buffer.hpp
+    opengl_buffer.hpp \
+    cuda_buffer.cuh
 
-DISTFILES += \
-    cuda_buffer.cu
+DISTFILES +=

@@ -55,13 +55,13 @@ public:
 	size_t size() const { return _size; }
 	void resize(size_t newSize,bool preserve=false)
 	{
-		if(preserve) resizeAndPreserve(newSize);
-		else resizeWithoutPreserve(newSize);
+		if(preserve && _size) reallocateAndPreserve(newSize);
+		else reallocateWithoutPreserve(newSize);
 	}
 	void copy_from(const T* source, size_t quantity, bool force_resize=false, size_t to_offset=0)
 	{
 		if(force_resize && (_size>(quantity+to_offset))) resize(quantity+to_offset,true);
-		cudaMemcpy(dev_mem+to_offset,source,sizeof(T)*tmp.size(),cudaMemcpyHostToDevice);
+		cudaMemcpy(dev_mem+to_offset,source,sizeof(T)*quantity,cudaMemcpyHostToDevice);
 	}
 	void copy_from(const base_buffer& source, size_t quantity, bool force_resize=false, size_t to_offset=0, size_t from_offset=0)
 	{

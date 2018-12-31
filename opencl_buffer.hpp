@@ -38,7 +38,7 @@ public:
 	size_t size() const { return _size; }
 	void resize(size_t newSize,bool preserve=false)
 	{
-		if(preserve) resizeAndPreserve(newSize);
+		if(preserve && _size) resizeAndPreserve(newSize);
 		else resizeWithoutPreserve(newSize);
 	}
 	void copy_from(const T* source, size_t quantity, bool force_resize=false, size_t to_offset=0)
